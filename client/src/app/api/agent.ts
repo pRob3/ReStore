@@ -66,10 +66,10 @@ const TestErrors = {
 
 const Basket = {
   get: () => requests.get('basket'),
-  addItem: (id: number, quantity = 1) =>
-    requests.post(`basket?productId=${id}&quantity=${quantity}`, {}),
-  removeItem: (id: number, quantity = 1) =>
-    requests.delete(`basket?productId=${id}&quantity=${quantity}`),
+  addItem: (productId: number, quantity = 1) =>
+    requests.post(`basket?productId=${productId}&quantity=${quantity}`, {}),
+  removeItem: (productId: number, quantity = 1) =>
+    requests.delete(`basket?productId=${productId}&quantity=${quantity}`),
 };
 
 const agent = {
