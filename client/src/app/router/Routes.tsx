@@ -1,5 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import AboutPage from '../../features/about/AboutPage';
+import Login from '../../features/account/Login';
+import Register from '../../features/account/Register';
 import BasketPage from '../../features/basket/BasketPage';
 import Catalog from '../../features/catalog/Catalog';
 import ProductDetails from '../../features/catalog/ProductDetails';
@@ -21,6 +23,9 @@ export const router = createBrowserRouter([
       { path: 'catalog/:id', element: <ProductDetails /> },
       { path: 'basket', element: <BasketPage /> },
       { path: 'checkout', element: <CheckoutPage /> },
+
+      { path: 'login', element: <Login /> },
+      { path: 'register', element: <Register /> },
 
       { path: 'about', element: <AboutPage /> },
       { path: 'contact', element: <ContactPage /> },
