@@ -27,20 +27,13 @@ export default function ProductCard({ product }: Props) {
     <Card>
       <CardHeader
         avatar={
-          <Avatar
-            sx={{
-              bgcolor: 'secondary.main',
-            }}
-          >
+          <Avatar sx={{ bgcolor: 'secondary.main' }}>
             {product.name.charAt(0).toUpperCase()}
           </Avatar>
         }
         title={product.name}
         titleTypographyProps={{
-          sx: {
-            fontWeight: 'bold',
-            color: 'primary.main',
-          },
+          sx: { fontWeight: 'bold', color: 'primary.main' },
         }}
       />
       <CardMedia
@@ -62,13 +55,13 @@ export default function ProductCard({ product }: Props) {
       </CardContent>
       <CardActions>
         <LoadingButton
-          loading={status.includes('pendingAddItem' + product.id)}
+          loading={status === 'pendingAddItem' + product.id}
           onClick={() =>
             dispatch(addBasketItemAsync({ productId: product.id }))
           }
           size='small'
         >
-          Add to cart
+          Add to Cart
         </LoadingButton>
         <Button component={Link} to={`/catalog/${product.id}`} size='small'>
           View
