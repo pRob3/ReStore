@@ -16,7 +16,7 @@ namespace API.Extensions
                     OrderDate = order.OrderDate,
                     ShippingAddress = order.ShippingAddress,
                     DeliveryFee = order.DeliveryFee,
-                    SubTotalt = order.SubTotalt,
+                    Subtotal = order.Subtotal,
                     OrderStatus = order.OrderStatus.ToString(),
                     Total = order.GetTotal(),
                     OrderItems = order.OrderItems.Select(item => new OrderItemDto
@@ -25,8 +25,9 @@ namespace API.Extensions
                         Name = item.ItemOrdered.Name,
                         PictureUrl = item.ItemOrdered.PictureUrl,
                         Price = item.Price,
-                        Quantity = item.Quantity,
-                    }).ToList()
+                        Quantity = item.Quantity
+                    })
+                    .ToList()
                 }).AsNoTracking();
         }
     }

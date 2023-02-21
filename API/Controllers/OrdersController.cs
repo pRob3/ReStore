@@ -4,13 +4,11 @@ using API.Entities;
 using API.Entities.OrderAggregate;
 using API.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-
     [Authorize]
     public class OrdersController : BaseApiController
     {
@@ -24,11 +22,12 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<OrderDto>>> GetOrders()
         {
-            return await _context.Orders
+            var orders = await _context.Orders
                 .ProjectOrderToOrderDto()
                 .Where(x => x.BuyerId == User.Identity.Name)
                 .ToListAsync();
 
+            return orders;
         }
 
         [HttpGet("{id}", Name = "GetOrder")]
@@ -36,8 +35,7 @@ namespace API.Controllers
         {
             return await _context.Orders
                 .ProjectOrderToOrderDto()
-                .Where(x => x.BuyerId == User.Identity.Name && x.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(x => x.BuyerId == User.Identity.Name && x.Id == id);
         }
 
         [HttpPost]
@@ -47,7 +45,10 @@ namespace API.Controllers
                 .RetrieveBasketWithItems(User.Identity.Name)
                 .FirstOrDefaultAsync();
 
-            if (basket == null) return BadRequest(new ProblemDetails { Title = "Could not locate basket" });
+            if (basket == null) return BadRequest(new ProblemDetails 
+            { 
+                Title = "Could not find basket" 
+            });
 
             var items = new List<OrderItem>();
 
@@ -58,10 +59,8 @@ namespace API.Controllers
                 {
                     ProductId = productItem.Id,
                     Name = productItem.Name,
-                    PictureUrl = productItem.PictureUrl,
-
+                    PictureUrl = productItem.PictureUrl
                 };
-
                 var orderItem = new OrderItem
                 {
                     ItemOrdered = itemOrdered,
@@ -80,18 +79,20 @@ namespace API.Controllers
                 OrderItems = items,
                 BuyerId = User.Identity.Name,
                 ShippingAddress = orderDto.ShippingAddress,
-                SubTotalt = subtotal,
-                DeliveryFee = deliveryFee,
+                Subtotal = subtotal,
+                DeliveryFee = deliveryFee
             };
 
             _context.Orders.Add(order);
             _context.Baskets.Remove(basket);
 
-
-            if (orderDto.SaveAdress)
+            if (orderDto.SaveAddress)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
-                user.Address = new UserAddress
+                var user = await _context.Users
+                    .Include(a => a.Address)
+                    .FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
+
+                var address = new UserAddress
                 {
                     FullName = orderDto.ShippingAddress.FullName,
                     Address1 = orderDto.ShippingAddress.Address1,
@@ -99,20 +100,16 @@ namespace API.Controllers
                     City = orderDto.ShippingAddress.City,
                     State = orderDto.ShippingAddress.State,
                     Zip = orderDto.ShippingAddress.Zip,
-                    Country = orderDto.ShippingAddress.Country,
+                    Country = orderDto.ShippingAddress.Country
                 };
-                _context.Update(user);
+                user.Address = address;
             }
 
             var result = await _context.SaveChangesAsync() > 0;
 
-            if(result)
-            {
-                return CreatedAtRoute("GetOrder", new { id = order.Id }, order.Id);
-            }
+            if (result) return CreatedAtRoute("GetOrder", new { id = order.Id }, order.Id);
 
             return BadRequest("Problem creating order");
         }
-        
     }
 }
