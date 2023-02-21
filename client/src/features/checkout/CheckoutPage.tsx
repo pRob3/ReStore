@@ -58,7 +58,7 @@ export default function CheckoutPage() {
         });
         setOrderNumber(orderNumber);
         setActiveStep(activeStep + 1);
-        dispatch(clearBasket);
+        dispatch(clearBasket());
         setLoading(false);
       } catch (error) {
         console.log(error);
