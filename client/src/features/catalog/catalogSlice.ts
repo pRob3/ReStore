@@ -53,7 +53,7 @@ export const fetchProductAsync = createAsyncThunk<Product, number>(
   'catalog/fetchProductAsync',
   async (productId, thunkAPI) => {
     try {
-      const product = await agent.Catalog.details(productId);
+      const product = (await agent.Catalog.details(productId)) as Product;
       return product;
     } catch (error: any) {
       return thunkAPI.rejectWithValue({ error: error.data });
